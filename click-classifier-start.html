@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Advanced Automation - Neural Network</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- p5 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.9.0/p5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.9.0/addons/p5.dom.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.9.0/addons/p5.sound.min.js"></script>
+    <!-- ml5 -->
+    <script src="https://unpkg.com/ml5@0.4.3/dist/ml5.min.js"></script>
+
+  </head>
+
+  <body>
+    <script>
+
+/* Use this code to start going through the tutorial at https://youtu.be/8HEgeAbYphA beginning at 9:00.
+
+*/
+let model;
+let targetLabel = 'C';
+//let trainingData = [];
+
+let state = 'collection';
+
+function setup() {
+
+  createCanvas(400, 400);
+  background(230);
+
+  let options = {
+    inputs: ['x', 'y'],
+    outputs: ['label'],
+    task: 'classification',
+    debug: 'true'
+  };
+  model = ml5.neuralNetwork(options);
+}
+
+function keyPressed(){
+
+  if (key == 't') {
+    console.log('starting traing');
+    model.normalizeData();
+    // normalize the data to make the figures be between 0 and 1
+    let options = {
+      epochs: 100
+      // while the ml5 is learning the data in one epoch,
+      // this make the program learns 100 times more data set
+      // if the neural network is learning slowly, we can give it
+      // a larger data set by raising hte epochs
+    }
+    model.train(options, finishedTraining, whileTraining);
+    // the whileTraining callback is executed every epoch
+    // the finishedTraining callback is when the whole thing is finished
+  } else{
+    targetLabel = key.toUpperCase();
+  }
+}
+
+function whileTraining(epoch, loss) {
+  // loss is how much of an error did the algorithm guess wrong
+  // as the trainging goes on, the loss should be going down
+  // it is making more correct answer everytime
+  console.log(epoch);
+}
+
+function finishedTraining() {
+  console.log('finished training.');
+  // I guess console.log is the same as print
+}
+
+function mousePressed() {
+
+  let inputs = {
+    x: mouseX,
+    y: mouseY
+  }
+
+  let target = {
+    //The out put it is aiming for
+    label: targetLabel
+  }
+
+  model.addData(inputs,target);
+  // collect data as pairs
+
+
+  stroke(0);
+  noFill();
+  ellipse(mouseX, mouseY, 24);
+  fill(0);
+  noStroke();
+  textAlign(CENTER,CENTER);
+  text(targetLabel, mouseX, mouseY);
+}
+
+
+
+    </script>
+  </body>
+</html>
